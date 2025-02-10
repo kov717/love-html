@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сердечко для Даши</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+        }
+        h1 {
+            position: absolute;
+            font-size: 50px;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="heartCanvas"></canvas>
+    <h1 id="text">Даша ❤️</h1>
+    <script>
+        const canvas = document.getElementById("heartCanvas");
+        const ctx = canvas.getContext("2d");
+        const text = document.getElementById("text");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function heartEquation(t) {
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+            return { x, y };
+        }
+
+        let points = [];
+        for (let t = 0; t < Math.PI * 2; t += 0.1) {
+            points.push(heartEquation(t));
+        }
+
+        let i = 0;
+        function drawHeart() {
+            if (i < points.length) {
+                const scale = 20;
+                const x = canvas.width / 2 + points[i].x * scale;
+                const y = canvas.height / 2 - points[i].y * scale;
+                
+                ctx.fillStyle = "red";
+                ctx.font = "20px Arial";
+                ctx.fillText("❤️", x, y);
+                
+                i++;
+                setTimeout(drawHeart, 50);
+            } else {
+                setTimeout(() => text.style.opacity = 1, 1000);
+                startHeartRain();
+            }
+        }
+
+        function startHeartRain() {
+            let hearts = [];
+            for (let i = 0; i < 30; i++) {
+                hearts.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * -canvas.height,
+                    speed: Math.random() * 3 + 2
+                });
+            }
+            function animateRain() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let j = 0; j < points.length; j++) {
+                    const scale = 20;
+                    const x = canvas.width / 2 + points[j].x * scale;
+                    const y = canvas.height / 2 - points[j].y * scale;
+                    ctx.fillText("❤️", x, y);
+                }
+                ctx.fillStyle = "red";
+                ctx.font = "20px Arial";
+                for (let heart of hearts) {
+                    ctx.fillText("❤️", heart.x, heart.y);
+                    heart.y += heart.speed;
+                    if (heart.y > canvas.height) heart.y = Math.random() * -canvas.height;
+                }
+                requestAnimationFrame(animateRain);
+            }
+            animateRain();
+        }
+
+        drawHeart();
+    </script>
+</body>
+</html>
